@@ -1,0 +1,38 @@
+listen 80
+
+<VirtualHost *:80>
+
+     # --- Configure VirtualHost ---
+
+    ServerName {{ server_name }}
+    ServerAdmin {{ server_admin }}
+    ServerAlias {{ server_alias }}
+    DocumentRoot {{ workdir }}/EcoMap/
+
+    # --- Configure WSGI Listening App(s) ---
+
+    WSGIDaemonProcess ecomap user={{ remote_username }} group={{ group_name }} threads=5 processes=5
+    WSGIScriptAlias / {{ workdir }}/EcoMap/ecomap/www/ecomap.wsgi
+
+    <Directory {{ workdir }}/EcoMap/ecomap/www/>
+        WSGIProcessGroup ecomap
+        WSGIApplicationGroup %{GLOBAL}
+        WSGIScriptReloading Off
+        Require all granted
+    </Directory>
+
+    # --- Configure Static Files ---
+
+    Alias /uploads/  {{ workdir }}/EcoMap/ecomap/www/uploads/
+    Alias /js/  {{ workdir }}/EcoMap/ecomap/www/media/js/
+    Alias /css/  {{ workdir }}/EcoMap/ecomap/www/media/css/
+    Alias /image/  {{ workdir }}/EcoMap/ecomap/www/media/image/
+    Alias /templates/ {{ workdir }}/EcoMap/ecomap/www/templates/
+    Alias /fonts/ {{ workdir }}/EcoMap/ecomap/www/media/fonts/
+
+    # --- Configure Apache logging ---
+    ErrorLog /var/log/ecomap_error.log
+    CustomLog /var/log/ecomap_access.log combined
+    LogLevel debug
+
+</VirtualHost>

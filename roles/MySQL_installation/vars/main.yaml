@@ -1,0 +1,9 @@
+mysql_version: mysql57-community-release-el7-11.noarch
+
+create_db:
+  script_name: "CREATE_DB.sql"
+  scripts_folder: "schema"
+
+insert_data:
+  script_name: "INSERT_DATA.sql"
+  scripts_folder: "data"

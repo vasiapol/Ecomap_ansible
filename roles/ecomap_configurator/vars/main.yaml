@@ -1,0 +1,10 @@
+group_name: user7
+server_name: ecomap.new
+server_admin: admin@ecomap.com
+server_alias: www.ecomap.new
+logging_level: INFO
+db_name: ecomap_db
+db_host_rw: localhost
+db_host_ro: localhost
+db_login_rw: root
+db_login_ro: root

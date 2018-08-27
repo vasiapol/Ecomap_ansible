@@ -1,0 +1,12 @@
+packages:
+  - wget
+  - python-devel
+  - mod_wsgi
+  - git
+  - httpd
+  - mysql-devel
+  - gcc
+  - nano
+  - MySQL-python
+  - memcached
+  - epel-release

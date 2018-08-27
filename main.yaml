@@ -1,0 +1,7 @@
+- hosts: all
+  become: yes
+  remote_user: "{{ remote_username }}"
+  roles:
+     - common
+     - MySQL_installation
+     - ecomap_configurator

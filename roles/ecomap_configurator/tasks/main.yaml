@@ -1,0 +1,28 @@
+- name: render apache config from template
+  template:
+    src: ecomap_apache.conf.j2
+    dest: /etc/httpd/conf.d/ecomap.conf
+
+- name: render ecomap configs from template
+  template:
+    src: "{{ item }}"
+    dest: "{{ workdir }}/EcoMap/ecomap/etc/{{ item.split('.j2')[0] }}"
+    owner: "{{ remote_username }}"
+    group: "{{ group_name}}"
+  with_items:
+    - _log.conf.j2
+    - db.conf.j2
+    - ecomap.conf.j2
+
+- name: modify httpd.conf
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: "Listen 80"
+    replace: "#Listen 80"
+    backup: yes
+
+
+- name: restart httpd
+  service:
+    name: httpd
+    state: restarted

@@ -1,0 +1,63 @@
+
+- name: upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: install packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - "{{ packages }}"
+
+- name: memcache
+  command: yum clean all
+  args:
+    warn: false
+
+- name: install python-pip
+  yum:
+    name: python-pip
+    state: latest
+
+- name: disable SELinux
+  selinux:
+    state: disabled
+
+- name: turnoff SELinux
+  shell: setenforce 0
+  ignore_errors: yes
+
+- name: stop and disable firewalld
+  service:
+    name: firewalld
+    enabled: no
+    state: stopped
+
+
+- name: clone ecomap git repo
+  git:
+    repo: 'https://github.com/lhalam/EcoMap.git'
+    dest: "{{ workdir }}/EcoMap"
+    update: no
+
+- name: render requirements.txt from template
+  template:
+    src: requirements.txt.j2
+    dest: "{{ workdir }}/EcoMap/requirements.txt"
+
+
+- name: upgrade pip
+  pip:
+    name: pip
+    state: latest
+
+- name: install requirements.txt
+  shell: "sudo pip install -r {{ workdir }}/EcoMap/requirements.txt"
+
+- name: fix permissions for root project directory
+  file:
+    path: "{{ workdir }}"
+    state: directory
+    mode: 0755

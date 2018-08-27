@@ -1,0 +1,15 @@
+[db]
+db={{ db_name }}
+rw.host={{ db_host_rw }}
+rw.port=eval(3306)
+rw.user={{ db_login_rw }}
+rw.password={{ mysql_root_password }}
+rw.pool_size = eval(3)
+ro.host={{ db_host_ro }}
+ro.port=eval(3306)
+ro.user={{ db_login_ro }}
+ro.password={{ mysql_root_password }}
+ro.pool_size = eval(3)
+connection_lifetime=eval(5)
+connection_retries=eval(3)
+retry_delay=eval(3)

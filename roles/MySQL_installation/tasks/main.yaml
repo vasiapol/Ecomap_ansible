@@ -1,0 +1,74 @@
+- name: download MySQL repo rpm
+  get_url:
+    url: https://dev.mysql.com/get/{{ mysql_version }}.rpm
+    dest: "{{ workdir }}/{{ mysql_version }}.rpm"
+    mode: 0755
+
+- name: install rpm MySQL
+  yum:
+    name: "{{ workdir }}/{{ mysql_version }}.rpm"
+    state: present
+
+- name: install MySQL
+  yum:
+    name: mysql-server
+    state: latest
+
+- name: start and enable MySQL
+  service:
+    name: mysqld
+    enabled: yes
+    state: started
+
+- name: Create variable from command
+  shell: cat /var/log/mysqld.log | grep 'temporary password' | cut -d ' ' -f 11
+  register: password_output
+- debug: msg="{{ password_output.stdout }}"
+
+- name: Set new password from temporary password
+  shell: 'mysql -e "SET PASSWORD = PASSWORD(''{{ mysql_root_password }}'');" --connect-expired-password -uroot -p"{{ password_output.stdout }}"'
+
+- name: delete anonymous MySQL server user for {{ ansible_nodename }}
+  mysql_user: login_user=root
+              login_password='{{ mysql_root_password }}'
+              check_implicit_admin=yes
+              user=""
+              host={{ item }}
+              state="absent"
+  with_items:
+     - ""
+     - "{{ ansible_nodename }}"
+     - localhost
+
+- name: remove the MySQL test database
+  action: mysql_db login_user=root login_password="{{ mysql_root_password }}" db=test state=absent
+
+
+
+- name: Create a new database with name 'ecomap_db'
+  mysql_db:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: ecomap_db
+    state: present
+
+- name: modify sql scripts to reflect absolute path
+  replace:
+    path: "{{ workdir }}/EcoMap/ecomap/db/ecomap/{{ item.script_name }}"
+    regexp: " {{ item.scripts_folder }}"
+    replace: " {{ workdir }}/EcoMap/ecomap/db/ecomap/{{ item.scripts_folder }}"
+    backup: yes
+  with_items:
+    - "{{ create_db }}"
+    - "{{ insert_data }}"
+
+- name: Restore database
+  mysql_db:
+    name: ecomap_db
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    state: import
+    target: "{{ workdir }}/EcoMap/ecomap/db/ecomap/{{ item }}.sql"
+  with_items:
+    - CREATE_DB
+    - INSERT_DATA
