@@ -60,4 +60,6 @@
   file:
     path: "{{ workdir }}"
     state: directory
+    owner: "{{ remote_username }}"
     mode: 0755
+    recurse: yes
