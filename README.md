@@ -1,1 +1,1 @@
-# work
+# ansible-playbook main.yml -i hosts 
